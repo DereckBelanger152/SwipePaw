@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "expo-nativewind",
-    "slug": "expo-nativewind",
+    "name": "Swipepaw",
+    "slug": "swipepaw",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "swipepaw",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
