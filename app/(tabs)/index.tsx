@@ -1,77 +1,54 @@
-import { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, Image, Dimensions, TouchableOpacity } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { Heart, X } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useRef } from 'react';
+import {
+  Animated,
+  PanResponder,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import { SAMPLE_PETS } from '@/data/pets';
-import { Match, Pet } from '@/types/pet';
 import MatchModal from '@/components/MatchModal';
+import { Heart, X } from 'lucide-react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_WIDTH = SCREEN_WIDTH * 0.9;
 
 export default function SwipeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatch, setShowMatch] = useState(false);
-  const translateX = useSharedValue(0);
-  const rotate = useSharedValue(0);
 
-  const handleMatch = useCallback(async (petId: string, liked: boolean) => {
-    try {
-      const match: Match = {
-        petId,
-        timestamp: Date.now(),
-        isMatch: liked && Math.random() < 0.1, // 10% match rate
-      };
+  const position = useRef(new Animated.ValueXY()).current;
 
-      const matches = await AsyncStorage.getItem('matches');
-      const existingMatches = matches ? JSON.parse(matches) : [];
-      await AsyncStorage.setItem('matches', JSON.stringify([...existingMatches, match]));
-
-      if (match.isMatch) {
-        setShowMatch(true);
-      }
-    } catch (error) {
-      console.error('Error saving match:', error);
-    }
-  }, []);
-
-  const onSwipe = useCallback((direction: 'left' | 'right') => {
-    const currentPet = SAMPLE_PETS[currentIndex];
-    handleMatch(currentPet.id, direction === 'right');
-    setCurrentIndex(prev => prev + 1);
-    translateX.value = 0;
-    rotate.value = 0;
-  }, [currentIndex, handleMatch]);
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      translateX.value = event.translationX;
-      rotate.value = event.translationX / CARD_WIDTH;
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        Math.abs(gestureState.dx) > 10,
+      onPanResponderMove: Animated.event(
+        [null, { dx: position.x, dy: position.y }],
+        { useNativeDriver: false }
+      ),
+      onPanResponderRelease: (_, gesture) => {
+        if (Math.abs(gesture.dx) > 120) {
+          Animated.timing(position, {
+            toValue: { x: gesture.dx > 0 ? SCREEN_WIDTH : -SCREEN_WIDTH, y: 0 },
+            duration: 250,
+            useNativeDriver: false,
+          }).start(() => {
+            position.setValue({ x: 0, y: 0 });
+            setCurrentIndex((prev) => prev + 1);
+            if (Math.random() < 0.1) setShowMatch(true);
+          });
+        } else {
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            useNativeDriver: false,
+          }).start();
+        }
+      },
     })
-    .onEnd((event) => {
-      if (Math.abs(event.velocityX) > 400) {
-        translateX.value = withSpring(Math.sign(event.velocityX) * SCREEN_WIDTH * 1.5);
-        runOnJS(onSwipe)(event.velocityX > 0 ? 'right' : 'left');
-      } else {
-        translateX.value = withSpring(0);
-        rotate.value = withTiming(0);
-      }
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { rotate: `${rotate.value * 15}deg` },
-    ],
-  }));
+  ).current;
 
   if (currentIndex >= SAMPLE_PETS.length) {
     return (
@@ -82,42 +59,46 @@ export default function SwipeScreen() {
   }
 
   const pet = SAMPLE_PETS[currentIndex];
+  const rotate = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
+    outputRange: ['-20deg', '0deg', '20deg'],
+    extrapolate: 'clamp',
+  });
+
+  const animatedStyle = {
+    transform: [...position.getTranslateTransform(), { rotate }],
+  };
 
   return (
     <View style={styles.container}>
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.card, animatedStyle]}>
-          <Image source={{ uri: pet.image }} style={styles.image} />
-          <View style={[styles.infoContainer, pet.isShelter && styles.shelterContainer]}>
-            <Text style={styles.name}>{pet.name}</Text>
-            <Text style={styles.age}>{pet.age}</Text>
-            <Text style={styles.description}>{pet.description}</Text>
-            {pet.isShelter && (
-              <View style={styles.shelterBadge}>
-                <Text style={styles.shelterText}>Shelter Pet</Text>
-              </View>
-            )}
-          </View>
-        </Animated.View>
-      </GestureDetector>
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[styles.card, animatedStyle]}
+      >
+        <Image source={{ uri: pet.image }} style={styles.image} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{pet.name}</Text>
+          <Text style={styles.age}>{pet.age}</Text>
+          <Text style={styles.description}>{pet.description}</Text>
+        </View>
+      </Animated.View>
 
       <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.passButton]}
-          onPress={() => onSwipe('left')}
-        >
+        <TouchableOpacity onPress={() => setCurrentIndex((prev) => prev + 1)}>
           <X color="#FF4B4B" size={32} />
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.likeButton]}
-          onPress={() => onSwipe('right')}
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentIndex((prev) => prev + 1);
+            if (Math.random() < 0.1) setShowMatch(true);
+          }}
         >
           <Heart color="#FFB5C2" size={32} fill="#FFB5C2" />
         </TouchableOpacity>
       </View>
 
-      <MatchModal 
-        isVisible={showMatch} 
+      <MatchModal
+        isVisible={showMatch}
         pet={pet}
         onClose={() => setShowMatch(false)}
       />
@@ -128,63 +109,24 @@ export default function SwipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#F8F8F8',
   },
   card: {
-    width: CARD_WIDTH,
-    height: CARD_WIDTH * 1.5,
+    width: SCREEN_WIDTH * 0.9,
+    height: SCREEN_WIDTH * 1.3,
+    backgroundColor: '#fff',
     borderRadius: 20,
-    backgroundColor: 'white',
-    overflow: 'hidden',
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  image: {
-    width: '100%',
-    height: '70%',
-    resizeMode: 'cover',
-  },
-  infoContainer: {
-    padding: 20,
-    backgroundColor: 'white',
-  },
-  shelterContainer: {
-    backgroundColor: '#FFF9FA',
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  age: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: '#444',
-    lineHeight: 20,
-  },
-  shelterBadge: {
+    overflow: 'hidden',
     position: 'absolute',
-    top: -15,
-    right: 20,
-    backgroundColor: '#FFB5C2',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
   },
-  shelterText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  image: { width: '100%', height: '70%' },
+  infoContainer: { padding: 20 },
+  name: { fontSize: 24, fontWeight: 'bold' },
+  age: { fontSize: 16, color: '#666' },
+  description: { fontSize: 14, color: '#444' },
   actionButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -192,27 +134,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 50,
   },
-  actionButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  passButton: {
-    backgroundColor: 'white',
-  },
-  likeButton: {
-    backgroundColor: 'white',
-  },
-  noMoreText: {
-    fontSize: 18,
-    color: '#666',
-  },
+  noMoreText: { fontSize: 18, color: '#666' },
 });

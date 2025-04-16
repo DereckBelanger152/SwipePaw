@@ -1,6 +1,14 @@
-import { useEffect } from 'react';
-import { Modal, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withSequence, withTiming } from 'react-native-reanimated';
+import { useEffect, useRef } from 'react';
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 import { Pet } from '@/types/pet';
 
 const { width } = Dimensions.get('window');
@@ -11,36 +19,45 @@ interface MatchModalProps {
   onClose: () => void;
 }
 
-export default function MatchModal({ isVisible, pet, onClose }: MatchModalProps) {
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(0);
+export default function MatchModal({
+  isVisible,
+  pet,
+  onClose,
+}: MatchModalProps) {
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isVisible) {
-      scale.value = withSequence(
-        withSpring(1.2),
-        withSpring(1)
-      );
-      opacity.value = withTiming(1, { duration: 300 });
+      Animated.parallel([
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+        }),
+      ]).start();
     } else {
-      scale.value = withSpring(0);
-      opacity.value = withTiming(0);
+      // Reset to initial state (for next time it's shown)
+      scaleAnim.setValue(0);
+      opacityAnim.setValue(0);
     }
   }, [isVisible]);
 
-  const containerStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  const contentStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  if (!isVisible) return null;
 
   return (
     <Modal transparent visible={isVisible} animationType="fade">
-      <Animated.View style={[styles.container, containerStyle]}>
-        <Animated.View style={[styles.content, contentStyle]}>
-          <Image source={{ uri: pet.image }} style={styles.image} />
+      <Animated.View style={[styles.container, { opacity: opacityAnim }]}>
+        <Animated.View
+          style={[styles.content, { transform: [{ scale: scaleAnim }] }]}
+        >
+          {pet?.image && (
+            <Image source={{ uri: pet.image }} style={styles.image} />
+          )}
           <View style={styles.textContainer}>
             <Text style={styles.matchText}>It's a Match!</Text>
             <Text style={styles.description}>
