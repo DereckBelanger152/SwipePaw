@@ -8,10 +8,13 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Button,
 } from 'react-native';
 import { SAMPLE_PETS } from '@/data/pets';
 import MatchModal from '@/components/MatchModal';
 import { Heart, X } from 'lucide-react-native';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/config/firebaseConfig';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -53,6 +56,9 @@ export default function SwipeScreen() {
   if (currentIndex >= SAMPLE_PETS.length) {
     return (
       <View style={styles.container}>
+        <View style={styles.logoutContainer}>
+          <Button title="Logout" onPress={() => signOut(auth)} />
+        </View>
         <Text style={styles.noMoreText}>No more pets to show!</Text>
       </View>
     );
@@ -71,6 +77,10 @@ export default function SwipeScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.logoutContainer}>
+        <Button title="Logout" onPress={() => signOut(auth)} />
+      </View>
+
       <Animated.View
         {...panResponder.panHandlers}
         style={[styles.card, animatedStyle]}
@@ -109,9 +119,14 @@ export default function SwipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F8F8F8',
+  },
+  logoutContainer: {
+    marginTop: 50,
+    width: '100%',
+    paddingHorizontal: 20,
+    alignItems: 'flex-end',
   },
   card: {
     width: SCREEN_WIDTH * 0.9,
@@ -121,6 +136,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     overflow: 'hidden',
     position: 'absolute',
+    top: 100,
   },
   image: { width: '100%', height: '70%' },
   infoContainer: { padding: 20 },
@@ -134,5 +150,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 50,
   },
-  noMoreText: { fontSize: 18, color: '#666' },
+  noMoreText: { fontSize: 18, color: '#666', marginTop: 100 },
 });
