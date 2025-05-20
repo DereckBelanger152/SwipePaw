@@ -14,8 +14,6 @@ import {
 import { SAMPLE_PETS } from "@/data/pets";
 import MatchModal from "@/components/MatchModal";
 import { Heart, X } from "lucide-react-native";
-import { signOut } from "firebase/auth";
-import { auth } from "@/config/firebase";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -57,9 +55,6 @@ export default function SwipeScreen() {
   if (currentIndex >= SAMPLE_PETS.length) {
     return (
       <View style={styles.container}>
-        <View style={styles.logoutContainer}>
-          <Button title="Logout" onPress={() => signOut(auth)} />
-        </View>
         <Text style={styles.noMoreText}>No more pets to show!</Text>
       </View>
     );
@@ -78,10 +73,6 @@ export default function SwipeScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.logoutContainer}>
-        <Button title="Logout" onPress={() => signOut(auth)} />
-      </View>
-
       <Animated.View
         {...panResponder.panHandlers}
         style={[styles.card, animatedStyle]}

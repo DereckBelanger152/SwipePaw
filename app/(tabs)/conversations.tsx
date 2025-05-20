@@ -1,12 +1,20 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, TextInput } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SAMPLE_PETS } from '@/data/pets';
-import { Match, Pet, Message, Conversation } from '@/types/pet';
+import { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SAMPLE_PETS } from "@/data/pets";
+import { Match, Pet, Message, Conversation } from "@/types/pet";
 
 export default function ConversationsScreen() {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [matches, setMatches] = useState<Match[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
@@ -16,24 +24,30 @@ export default function ConversationsScreen() {
 
   const loadMatches = async () => {
     try {
-      const matchesData = await AsyncStorage.getItem('matches');
+      const matchesData = await AsyncStorage.getItem("matches");
       const savedMatches = matchesData ? JSON.parse(matchesData) : [];
       setMatches(savedMatches);
 
-      const conversationsData = await AsyncStorage.getItem('conversations');
-      const savedConversations = conversationsData ? JSON.parse(conversationsData) : [];
+      const conversationsData = await AsyncStorage.getItem("conversations");
+      const savedConversations = conversationsData
+        ? JSON.parse(conversationsData)
+        : [];
       setConversations(savedConversations);
     } catch (error) {
-      console.error('Error loading matches:', error);
+      console.error("Error loading matches:", error);
     }
   };
 
   const getMatchedPets = () => {
     const matchedPetIds = matches
-      .filter(match => match.isMatch || SAMPLE_PETS.find(pet => pet.id === match.petId)?.isShelter)
-      .map(match => match.petId);
-    
-    return SAMPLE_PETS.filter(pet => matchedPetIds.includes(pet.id));
+      .filter(
+        (match) =>
+          match.isMatch ||
+          SAMPLE_PETS.find((pet) => pet.id === match.petId)?.isShelter
+      )
+      .map((match) => match.petId);
+
+    return SAMPLE_PETS.filter((pet) => matchedPetIds.includes(pet.id));
   };
 
   const handleSendMessage = async () => {
@@ -47,11 +61,13 @@ export default function ConversationsScreen() {
         isUser: true,
       };
 
-      const existingConversation = conversations.find(c => c.petId === selectedPet.id);
+      const existingConversation = conversations.find(
+        (c) => c.petId === selectedPet.id
+      );
       let updatedConversations: Conversation[];
 
       if (existingConversation) {
-        updatedConversations = conversations.map(c =>
+        updatedConversations = conversations.map((c) =>
           c.petId === selectedPet.id
             ? {
                 ...c,
@@ -71,20 +87,24 @@ export default function ConversationsScreen() {
         ];
       }
 
-      await AsyncStorage.setItem('conversations', JSON.stringify(updatedConversations));
+      await AsyncStorage.setItem(
+        "conversations",
+        JSON.stringify(updatedConversations)
+      );
       setConversations(updatedConversations);
-      setMessage('');
+      setMessage("");
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   };
 
   const renderItem = ({ item: pet }: { item: Pet }) => {
-    const conversation = conversations.find(c => c.petId === pet.id);
-    const lastMessage = conversation?.messages[conversation.messages.length - 1];
+    const conversation = conversations.find((c) => c.petId === pet.id);
+    const lastMessage =
+      conversation?.messages[conversation.messages.length - 1];
 
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.conversationItem, pet.isShelter && styles.shelterItem]}
         onPress={() => setSelectedPet(pet)}
       >
@@ -95,7 +115,7 @@ export default function ConversationsScreen() {
             <Text style={styles.shelterName}>{pet.shelterName}</Text>
           )}
           <Text style={styles.lastMessage} numberOfLines={1}>
-            {lastMessage?.text || 'Start a conversation!'}
+            {lastMessage?.text || "Start a conversation!"}
           </Text>
         </View>
       </TouchableOpacity>
@@ -105,7 +125,7 @@ export default function ConversationsScreen() {
   const renderMessages = () => {
     if (!selectedPet) return null;
 
-    const conversation = conversations.find(c => c.petId === selectedPet.id);
+    const conversation = conversations.find((c) => c.petId === selectedPet.id);
     const messages = conversation?.messages || [];
 
     return (
@@ -118,10 +138,15 @@ export default function ConversationsScreen() {
         </View>
         <FlatList
           data={messages}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           style={styles.messagesList}
           renderItem={({ item }) => (
-            <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.petMessage]}>
+            <View
+              style={[
+                styles.messageContainer,
+                item.isUser ? styles.userMessage : styles.petMessage,
+              ]}
+            >
               <Text style={styles.messageText}>{item.text}</Text>
             </View>
           )}
@@ -134,7 +159,10 @@ export default function ConversationsScreen() {
             onChangeText={setMessage}
             placeholderTextColor="#999"
           />
-          <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleSendMessage}
+          >
             <Text style={styles.sendButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
@@ -152,7 +180,7 @@ export default function ConversationsScreen() {
           <FlatList
             data={getMatchedPets()}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}
           />
         </>
@@ -164,33 +192,33 @@ export default function ConversationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#F8F8F8",
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   listContainer: {
     padding: 10,
   },
   conversationItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 15,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     marginBottom: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
   shelterItem: {
-    backgroundColor: '#FFF9FA',
+    backgroundColor: "#FFF9FA",
     borderWidth: 1,
-    borderColor: '#FFE5E9',
+    borderColor: "#FFE5E9",
   },
   avatar: {
     width: 50,
@@ -203,85 +231,85 @@ const styles = StyleSheet.create({
   },
   petName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 2,
   },
   shelterName: {
     fontSize: 12,
-    color: '#FFB5C2',
+    color: "#FFB5C2",
     marginBottom: 4,
   },
   lastMessage: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   chatContainer: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   chatHeader: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderBottomColor: "#EEE",
+    flexDirection: "row",
+    alignItems: "center",
   },
   backButton: {
     fontSize: 16,
-    color: '#FFB5C2',
+    color: "#FFB5C2",
     marginRight: 15,
   },
   chatTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   messagesList: {
     flex: 1,
     padding: 15,
   },
   messageContainer: {
-    maxWidth: '80%',
+    maxWidth: "80%",
     marginBottom: 10,
     padding: 12,
     borderRadius: 16,
   },
   userMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#FFB5C2',
+    alignSelf: "flex-end",
+    backgroundColor: "#FFB5C2",
   },
   petMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#F0F0F0',
+    alignSelf: "flex-start",
+    backgroundColor: "#F0F0F0",
   },
   messageText: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
   },
   inputContainer: {
     padding: 15,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: "white",
+    flexDirection: "row",
+    alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: '#EEE',
+    borderTopColor: "#EEE",
   },
   input: {
     flex: 1,
     height: 40,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#F8F8F8",
     borderRadius: 20,
     paddingHorizontal: 15,
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: '#FFB5C2',
+    backgroundColor: "#FFB5C2",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
   },
   sendButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
 });

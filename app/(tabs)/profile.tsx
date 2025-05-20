@@ -1,5 +1,11 @@
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { Settings, Heart, Bell, Shield, HelpCircle } from 'lucide-react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { Settings, Heart, Bell, Shield, HelpCircle } from "lucide-react-native";
 
 export default function ProfileScreen() {
   return (
@@ -48,75 +54,75 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#F8F8F8",
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: "#EEE",
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFB5C2',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#FFB5C2",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
   },
   profileInitial: {
     fontSize: 32,
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
   name: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginTop: 20,
     padding: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 15,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: "#F0F0F0",
   },
   menuText: {
     marginLeft: 15,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   logoutButton: {
     margin: 20,
-    backgroundColor: '#FFB5C2',
+    backgroundColor: "#FFB5C2",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoutText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   version: {
-    textAlign: 'center',
-    color: '#999',
+    textAlign: "center",
+    color: "#999",
     marginBottom: 20,
   },
 });
