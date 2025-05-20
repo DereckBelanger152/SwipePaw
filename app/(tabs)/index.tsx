@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import "react-native-url-polyfill/auto";
+import { useState, useRef } from "react";
 import {
   Animated,
   PanResponder,
@@ -9,14 +10,14 @@ import {
   Dimensions,
   TouchableOpacity,
   Button,
-} from 'react-native';
-import { SAMPLE_PETS } from '@/data/pets';
-import MatchModal from '@/components/MatchModal';
-import { Heart, X } from 'lucide-react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/config/firebaseConfig';
+} from "react-native";
+import { SAMPLE_PETS } from "@/data/pets";
+import MatchModal from "@/components/MatchModal";
+import { Heart, X } from "lucide-react-native";
+import { signOut } from "firebase/auth";
+import { auth } from "@/config/firebase";
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function SwipeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -67,8 +68,8 @@ export default function SwipeScreen() {
   const pet = SAMPLE_PETS[currentIndex];
   const rotate = position.x.interpolate({
     inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: ['-20deg', '0deg', '20deg'],
-    extrapolate: 'clamp',
+    outputRange: ["-20deg", "0deg", "20deg"],
+    extrapolate: "clamp",
   });
 
   const animatedStyle = {
@@ -119,36 +120,36 @@ export default function SwipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#F8F8F8',
+    alignItems: "center",
+    backgroundColor: "#F8F8F8",
   },
   logoutContainer: {
     marginTop: 50,
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 20,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   card: {
     width: SCREEN_WIDTH * 0.9,
     height: SCREEN_WIDTH * 1.3,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     elevation: 5,
-    overflow: 'hidden',
-    position: 'absolute',
+    overflow: "hidden",
+    position: "absolute",
     top: 100,
   },
-  image: { width: '100%', height: '70%' },
+  image: { width: "100%", height: "70%" },
   infoContainer: { padding: 20 },
-  name: { fontSize: 24, fontWeight: 'bold' },
-  age: { fontSize: 16, color: '#666' },
-  description: { fontSize: 14, color: '#444' },
+  name: { fontSize: 24, fontWeight: "bold" },
+  age: { fontSize: 16, color: "#666" },
+  description: { fontSize: 14, color: "#444" },
   actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '80%',
-    position: 'absolute',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "80%",
+    position: "absolute",
     bottom: 50,
   },
-  noMoreText: { fontSize: 18, color: '#666', marginTop: 100 },
+  noMoreText: { fontSize: 18, color: "#666", marginTop: 100 },
 });

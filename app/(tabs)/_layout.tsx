@@ -1,7 +1,7 @@
-import { Tabs } from 'expo-router';
-import { Heart, MessageCircle, User } from 'lucide-react-native';
+import { Tabs } from "expo-router";
+import { Heart, MessageCircle, User } from "lucide-react-native";
 
-const PASTEL_PINK = '#FFB5C2';
+const PASTEL_PINK = "#FFB5C2";
 
 export default function TabLayout() {
   return (
@@ -9,24 +9,23 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#F0F0F0',
+          backgroundColor: "#FFFFFF",
+          borderTopColor: "#F0F0F0",
         },
         tabBarActiveTintColor: PASTEL_PINK,
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Discover',
-          tabBarIcon: ({ color, size }) => (
-            <Heart size={size} color={color} />
-          ),
+          title: "Discover",
+          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="conversations"
         options={{
-          title: 'Messages',
+          title: "Messages",
           tabBarIcon: ({ color, size }) => (
             <MessageCircle size={size} color={color} />
           ),
@@ -35,10 +34,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
-          ),
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
     </Tabs>
