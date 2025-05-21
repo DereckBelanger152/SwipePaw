@@ -8,7 +8,7 @@ import PetCard from "@/components/cards/PetCard";
 import ActionButton from "@/components/ui/ActionButton";
 import MatchModal from "@/components/cards/MatchModal";
 import { mockPets, mockUser } from "@/data/mockData";
-import { Pet } from "@/types";
+import { Pet, Conversation, Message } from "@/types";
 
 export default function DiscoverScreen() {
   const router = useRouter();
@@ -16,34 +16,52 @@ export default function DiscoverScreen() {
   const [matchVisible, setMatchVisible] = useState(false);
   const [matchedPet, setMatchedPet] = useState<Pet | null>(null);
   const swipedPetsRef = useRef<Set<string>>(new Set());
+  const [conversations, setConversations] = useState<Conversation[]>([]);
 
   // Current pet to display
   const currentPet = mockPets[currentIndex];
 
+  // Create a new conversation
+  const createConversation = (pet: Pet) => {
+    const newConversation: Conversation = {
+      id: `conv-${Date.now()}`,
+      petId: pet.id,
+      messages: [],
+      lastMessage: {
+        id: `msg-${Date.now()}`,
+        senderId: pet.id,
+        text: `Hi! Thanks for matching with ${pet.name}! How can I help you today?`,
+        timestamp: new Date(),
+        status: "delivered",
+      },
+      unreadCount: 1,
+      updatedAt: new Date(),
+    };
+
+    setConversations((prev) => [...prev, newConversation]);
+    return newConversation;
+  };
+
   // Handle swipe actions
   const handleSwipeLeft = () => {
-    // Skip this pet
     swipedPetsRef.current.add(currentPet.id);
-    // Move to next pet
     moveToNextPet();
   };
 
   const handleSwipeRight = () => {
-    // Like this pet
     swipedPetsRef.current.add(currentPet.id);
 
-    // Simulate a match (for demo purposes, every other like is a match)
-    if (currentIndex % 2 === 0) {
+    // Only create matches for adoptable pets
+    if (currentPet.adoptable) {
+      const conversation = createConversation(currentPet);
       setMatchedPet(currentPet);
       setMatchVisible(true);
     }
 
-    // Move to next pet
     moveToNextPet();
   };
 
   const handleSwipeUp = () => {
-    // Navigate to pet details
     router.push(`/pet/${currentPet.id}`);
   };
 
@@ -51,9 +69,7 @@ export default function DiscoverScreen() {
     if (currentIndex < mockPets.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
-      // Reached the end of the list
-      // In a real app, you'd fetch more pets
-      setCurrentIndex(0); // For demo, loop back to start
+      setCurrentIndex(0);
     }
   };
 
@@ -64,11 +80,12 @@ export default function DiscoverScreen() {
   };
 
   const handleStartChat = () => {
-    // In a real app, this would create a conversation
     setMatchVisible(false);
     if (matchedPet) {
-      // Navigate to chat
-      router.push(`/chat/${matchedPet.id}`);
+      const conversation = conversations.find((c) => c.petId === matchedPet.id);
+      if (conversation) {
+        router.push(`/chat/${conversation.id}`);
+      }
     }
   };
 
@@ -118,7 +135,6 @@ export default function DiscoverScreen() {
         />
       </View>
 
-      {/* Match modal */}
       {matchedPet && (
         <MatchModal
           visible={matchVisible}
@@ -153,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingBottom: 80, // Space for action buttons
+    paddingBottom: 80,
   },
   actionsContainer: {
     flexDirection: "row",

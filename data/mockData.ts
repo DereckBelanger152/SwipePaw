@@ -1,6 +1,31 @@
 import { Pet, User, Conversation, Message } from '../types';
 
-export const mockPets: Pet[] = [
+// Helper function to generate random non-adoptable pets
+const generateNonAdoptablePets = (count: number): Pet[] => {
+  const breeds = ['Mixed Breed', 'Domestic Shorthair', 'Unknown'];
+  const photos = [
+    'https://images.pexels.com/photos/2061057/pexels-photo-2061057.jpeg',
+    'https://images.pexels.com/photos/1490908/pexels-photo-1490908.jpeg',
+    'https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg',
+    'https://images.pexels.com/photos/3361739/pexels-photo-3361739.jpeg',
+  ];
+  
+  return Array.from({ length: count }, (_, i) => ({
+    id: `na-${i + 1}`,
+    name: ['Buddy', 'Milo', 'Daisy', 'Lucy', 'Bailey'][Math.floor(Math.random() * 5)],
+    photos: [photos[Math.floor(Math.random() * photos.length)]],
+    age: `${Math.floor(Math.random() * 10 + 1)} years`,
+    breed: breeds[Math.floor(Math.random() * breeds.length)],
+    location: '',
+    distance: '',
+    description: '',
+    adoptable: false,
+    facts: [],
+  }));
+};
+
+// Adoptable pets (30%)
+const adoptablePets: Pet[] = [
   {
     id: '1',
     name: 'Luna',
@@ -67,51 +92,13 @@ export const mockPets: Pet[] = [
       { icon: 'home', label: 'Needs', value: 'Family Home' },
     ],
   },
-  {
-    id: '4',
-    name: 'Max',
-    photos: [
-      'https://images.pexels.com/photos/1490908/pexels-photo-1490908.jpeg',
-      'https://images.pexels.com/photos/551628/pexels-photo-551628.jpeg'
-    ],
-    age: '3 years',
-    breed: 'Golden Retriever',
-    location: 'San Jose, CA',
-    distance: '12.1 miles away',
-    description: 'Max is a gentle golden who loves swimming and playing fetch. He gets along with both dogs and cats.',
-    adoptable: true,
-    shelterName: 'Golden Hearts Rescue',
-    shelterVerified: true,
-    facts: [
-      { icon: 'heart', label: 'Temperament', value: 'Gentle' },
-      { icon: 'zap', label: 'Energy', value: 'Medium' },
-      { icon: 'heart', label: 'Good with', value: 'All Pets' },
-      { icon: 'home', label: 'Needs', value: 'Loving Home' },
-    ],
-  },
-  {
-    id: '5',
-    name: 'Charlie',
-    photos: [
-      'https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg',
-      'https://images.pexels.com/photos/1854494/pexels-photo-1854494.jpeg'
-    ],
-    age: '5 years',
-    breed: 'Beagle',
-    location: 'San Mateo, CA',
-    distance: '15.3 miles away',
-    description: 'Charlie is a sweet beagle with a nose for adventure. He enjoys walks, treats, and afternoon naps.',
-    adoptable: true,
-    shelterName: 'Bay Area Pet Rescue',
-    shelterVerified: true,
-    facts: [
-      { icon: 'heart', label: 'Temperament', value: 'Sweet' },
-      { icon: 'zap', label: 'Energy', value: 'Medium' },
-      { icon: 'heart', label: 'Good with', value: 'Adults' },
-      { icon: 'home', label: 'Needs', value: 'Solo Pet Home' },
-    ],
-  },
 ];
+
+// Generate non-adoptable pets (70%)
+const nonAdoptablePets = generateNonAdoptablePets(7);
+
+// Combine and export all pets
+export const mockPets: Pet[] = [...adoptablePets, ...nonAdoptablePets];
 
 export const mockUser: User = {
   id: 'user1',
