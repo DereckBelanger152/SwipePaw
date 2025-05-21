@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { View, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
+import WelcomePopup from "@/components/onboarding/WelcomePopup";
 
 export default function RootLayout() {
   useFrameworkReady();
+  const [showWelcome, setShowWelcome] = useState(true);
 
   return (
     <UserPreferencesProvider>
@@ -41,6 +43,11 @@ export default function RootLayout() {
           />
         </Stack>
         <StatusBar style="auto" />
+
+        <WelcomePopup
+          visible={showWelcome}
+          onClose={() => setShowWelcome(false)}
+        />
       </View>
     </UserPreferencesProvider>
   );
