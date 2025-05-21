@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+// app/(tabs)/index.tsx
+import React, { useState, useRef, useCallback } from "react";
 import { View, StyleSheet, SafeAreaView, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { X, Heart, Info } from "lucide-react-native";
@@ -8,10 +9,13 @@ import PetCard from "@/components/cards/PetCard";
 import ActionButton from "@/components/ui/ActionButton";
 import MatchModal from "@/components/cards/MatchModal";
 import { mockPets, mockUser } from "@/data/mockData";
-import { Pet, Conversation, Message } from "@/types";
+import { Pet, Conversation } from "@/types";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function DiscoverScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
+  const [pets, setPets] = useState(mockPets);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchVisible, setMatchVisible] = useState(false);
   const [matchedPet, setMatchedPet] = useState<Pet | null>(null);
@@ -19,7 +23,7 @@ export default function DiscoverScreen() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
   // Current pet to display
-  const currentPet = mockPets[currentIndex];
+  const currentPet = pets[currentIndex];
 
   // Create a new conversation
   const createConversation = (pet: Pet) => {
@@ -43,35 +47,43 @@ export default function DiscoverScreen() {
   };
 
   // Handle swipe actions
-  const handleSwipeLeft = () => {
-    swipedPetsRef.current.add(currentPet.id);
-    moveToNextPet();
-  };
-
-  const handleSwipeRight = () => {
-    swipedPetsRef.current.add(currentPet.id);
-
-    // Only create matches for adoptable pets
-    if (currentPet.adoptable) {
-      const conversation = createConversation(currentPet);
-      setMatchedPet(currentPet);
-      setMatchVisible(true);
+  const handleSwipeLeft = useCallback(() => {
+    if (currentPet) {
+      swipedPetsRef.current.add(currentPet.id);
+      moveToNextPet();
     }
+  }, [currentPet]);
 
-    moveToNextPet();
-  };
+  const handleSwipeRight = useCallback(() => {
+    if (currentPet) {
+      swipedPetsRef.current.add(currentPet.id);
 
-  const handleSwipeUp = () => {
-    router.push(`/pet/${currentPet.id}`);
-  };
+      // Only create matches for adoptable pets
+      if (currentPet.adoptable) {
+        const conversation = createConversation(currentPet);
+        setMatchedPet(currentPet);
+        setMatchVisible(true);
+      }
 
-  const moveToNextPet = () => {
-    if (currentIndex < mockPets.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-    } else {
-      setCurrentIndex(0);
+      moveToNextPet();
     }
-  };
+  }, [currentPet]);
+
+  const handleSwipeUp = useCallback(() => {
+    if (currentPet) {
+      router.push(`/pet/${currentPet.id}`);
+    }
+  }, [currentPet, router]);
+
+  const moveToNextPet = useCallback(() => {
+    setCurrentIndex((prevIndex) => {
+      // If we've reached the end, reset to beginning
+      if (prevIndex >= pets.length - 1) {
+        return 0;
+      }
+      return prevIndex + 1;
+    });
+  }, [pets.length]);
 
   // Handle match modal actions
   const handleCloseMatch = () => {
@@ -92,12 +104,13 @@ export default function DiscoverScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.appName}>SwipePaw</Text>
+        <Text style={styles.appName}>{t("appName")}</Text>
       </View>
 
       <View style={styles.cardContainer}>
         {currentPet ? (
           <PetCard
+            key={currentPet.id}
             pet={currentPet}
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
@@ -105,9 +118,7 @@ export default function DiscoverScreen() {
           />
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>
-              No more pets to discover. Check back later!
-            </Text>
+            <Text style={styles.emptyStateText}>{t("messages.noMatches")}</Text>
           </View>
         )}
       </View>
