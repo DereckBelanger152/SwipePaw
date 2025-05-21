@@ -15,6 +15,7 @@ import {
   Shield,
   CircleHelp as HelpCircle,
   LogOut,
+  Globe2,
 } from "lucide-react-native";
 import { Colors, shadowStyles } from "@/constants/Colors";
 import { Layout } from "@/constants/Layout";
@@ -23,9 +24,11 @@ import PetTypeSelector from "@/components/profile/PetTypeSelector";
 import RangeSelector from "@/components/profile/RangeSelector";
 import { mockUser } from "@/data/mockData";
 import { UserPreferencesContext } from "@/context/UserPreferencesContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ProfileScreen() {
   const { preferences, updatePreferences } = useContext(UserPreferencesContext);
+  const { language, setLanguage, t } = useLanguage();
   const [showPetTypes, setShowPetTypes] = useState(false);
   const [showAgeRange, setShowAgeRange] = useState(false);
   const [showDistance, setShowDistance] = useState(false);
@@ -46,17 +49,20 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("profile.logout"), "Are you sure you want to logout?", [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Logout",
+        text: t("profile.logout"),
         style: "destructive",
         onPress: () => {
-          // Handle logout
           Alert.alert("Logged out successfully");
         },
       },
     ]);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "fr" : "en");
   };
 
   return (
@@ -68,7 +74,7 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+          <Text style={styles.sectionTitle}>{t("profile.preferences")}</Text>
 
           <View style={styles.card}>
             <TouchableOpacity
@@ -76,7 +82,9 @@ export default function ProfileScreen() {
               onPress={() => setShowPetTypes(true)}
             >
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Pet Types</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.petTypes")}
+                </Text>
                 <Text style={styles.menuItemValue}>
                   {preferences.petTypes.join(", ")}
                 </Text>
@@ -89,9 +97,12 @@ export default function ProfileScreen() {
               onPress={() => setShowAgeRange(true)}
             >
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Age Range</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.ageRange")}
+                </Text>
                 <Text style={styles.menuItemValue}>
-                  {preferences.ageRange[0]} - {preferences.ageRange[1]} years
+                  {preferences.ageRange[0]} - {preferences.ageRange[1]}{" "}
+                  {t("common.years")}
                 </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
@@ -102,9 +113,11 @@ export default function ProfileScreen() {
               onPress={() => setShowDistance(true)}
             >
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Max Distance</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.maxDistance")}
+                </Text>
                 <Text style={styles.menuItemValue}>
-                  {preferences.maxDistance} miles
+                  {preferences.maxDistance} {t("common.miles")}
                 </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
@@ -113,22 +126,43 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Notifications</Text>
+          <Text style={styles.sectionTitle}>
+            {t("profile.notifications.title")}
+          </Text>
 
           <View style={styles.card}>
             <PreferenceItem
-              label="Push Notifications"
+              label={t("profile.notifications.title")}
               value={preferences.notifications}
               onValueChange={(value) =>
                 updatePreferences({ ...preferences, notifications: value })
               }
-              description="Receive notifications for new matches and messages"
+              description={t("profile.notifications.description")}
             />
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
+          <Text style={styles.sectionTitle}>Language</Text>
+
+          <View style={styles.card}>
+            <TouchableOpacity style={styles.menuItem} onPress={toggleLanguage}>
+              <View style={styles.menuItemIcon}>
+                <Globe2 size={24} color={Colors.primary.accent1} />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Language / Langue</Text>
+                <Text style={styles.menuItemValue}>
+                  {language === "en" ? "English" : "Français"}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("profile.support")}</Text>
 
           <View style={styles.card}>
             <TouchableOpacity style={styles.menuItem}>
@@ -136,7 +170,9 @@ export default function ProfileScreen() {
                 <HelpCircle size={24} color={Colors.primary.accent1} />
               </View>
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Help & Support</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.helpSupport")}
+                </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
@@ -146,7 +182,9 @@ export default function ProfileScreen() {
                 <Shield size={24} color={Colors.primary.accent1} />
               </View>
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Privacy Policy</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.privacyPolicy")}
+                </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
@@ -156,7 +194,9 @@ export default function ProfileScreen() {
                 <Bell size={24} color={Colors.primary.accent1} />
               </View>
               <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemTitle}>Terms of Service</Text>
+                <Text style={styles.menuItemTitle}>
+                  {t("profile.termsOfService")}
+                </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
@@ -165,11 +205,11 @@ export default function ProfileScreen() {
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <LogOut size={20} color={Colors.secondary.red} />
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={styles.logoutText}>{t("profile.logout")}</Text>
         </TouchableOpacity>
 
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>SwipePaw v1.0.0</Text>
+          <Text style={styles.versionText}>{t("profile.version")}</Text>
         </View>
       </ScrollView>
 
@@ -182,24 +222,24 @@ export default function ProfileScreen() {
 
       <RangeSelector
         visible={showAgeRange}
-        title="Age Range"
+        title={t("profile.ageRange")}
         value={preferences.ageRange}
         min={0}
         max={20}
         step={1}
-        unit="years"
+        unit={t("common.years")}
         onClose={() => setShowAgeRange(false)}
         onSave={handleUpdateAgeRange}
       />
 
       <RangeSelector
         visible={showDistance}
-        title="Maximum Distance"
+        title={t("profile.maxDistance")}
         value={[0, preferences.maxDistance]}
         min={1}
         max={100}
         step={1}
-        unit="miles"
+        unit={t("common.miles")}
         onClose={() => setShowDistance(false)}
         onSave={(range) => handleUpdateDistance(range[1])}
       />

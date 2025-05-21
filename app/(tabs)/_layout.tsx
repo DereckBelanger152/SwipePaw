@@ -1,13 +1,16 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { View } from 'react-native';
-import { Chrome as Home, MessageCircle, User } from 'lucide-react-native';
-import { Colors } from '@/constants/Colors';
-import { useFonts } from '@/hooks/useFonts';
+import React from "react";
+import { Tabs } from "expo-router";
+import { View } from "react-native";
+import { Chrome as Home, MessageCircle, User } from "lucide-react-native";
+import { Colors } from "@/constants/Colors";
+import { useFonts } from "@/hooks/useFonts";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSwitch from "@/components/ui/LanguageSwitch";
 
 export default function TabLayout() {
   const { appIsReady, onLayoutRootView } = useFonts();
-  
+  const { t } = useLanguage();
+
   if (!appIsReady) {
     return null;
   }
@@ -28,24 +31,23 @@ export default function TabLayout() {
             paddingTop: 5,
           },
           tabBarLabelStyle: {
-            fontFamily: 'Inter-Medium',
+            fontFamily: "Inter-Medium",
             fontSize: 12,
           },
+          headerRight: () => <LanguageSwitch />,
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Discover',
-            tabBarIcon: ({ color, size }) => (
-              <Home size={size} color={color} />
-            ),
+            title: t("tabs.discover"),
+            tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="conversations"
           options={{
-            title: 'Chats',
+            title: t("tabs.chats"),
             tabBarIcon: ({ color, size }) => (
               <MessageCircle size={size} color={color} />
             ),
@@ -54,10 +56,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Profile',
-            tabBarIcon: ({ color, size }) => (
-              <User size={size} color={color} />
-            ),
+            title: t("tabs.profile"),
+            tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
           }}
         />
       </Tabs>
