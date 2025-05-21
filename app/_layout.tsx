@@ -4,42 +4,45 @@ import { StatusBar } from "expo-status-bar";
 import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { View, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 
 export default function RootLayout() {
   useFrameworkReady();
 
   return (
-    <View style={styles.container}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: styles.content,
-          animation: "slide_from_right",
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="pet/[id]"
-          options={{
-            presentation: "modal",
-            animation: "slide_from_bottom",
+    <UserPreferencesProvider>
+      <View style={styles.container}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: styles.content,
+            animation: "slide_from_right",
           }}
-        />
-        <Stack.Screen
-          name="chat/[id]"
-          options={{
-            headerShown: true,
-            headerTitle: "",
-            headerBackTitle: "Back",
-            headerTintColor: Colors.primary.accent1,
-            headerStyle: {
-              backgroundColor: Colors.ui.cardBackground,
-            },
-          }}
-        />
-      </Stack>
-      <StatusBar style="auto" />
-    </View>
+        >
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="pet/[id]"
+            options={{
+              presentation: "modal",
+              animation: "slide_from_bottom",
+            }}
+          />
+          <Stack.Screen
+            name="chat/[id]"
+            options={{
+              headerShown: true,
+              headerTitle: "",
+              headerBackTitle: "Back",
+              headerTintColor: Colors.primary.accent1,
+              headerStyle: {
+                backgroundColor: Colors.ui.cardBackground,
+              },
+            }}
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </View>
+    </UserPreferencesProvider>
   );
 }
 

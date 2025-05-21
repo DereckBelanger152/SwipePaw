@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,54 +7,87 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { ChevronRight, Bell, Shield, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
-import { Colors, shadowStyles } from '@/constants/Colors';
-import { Layout } from '@/constants/Layout';
-import PreferenceItem from '@/components/profile/PreferenceItem';
-import { mockUser } from '@/data/mockData';
+  Alert,
+} from "react-native";
+import {
+  ChevronRight,
+  Bell,
+  Shield,
+  CircleHelp as HelpCircle,
+  LogOut,
+} from "lucide-react-native";
+import { Colors, shadowStyles } from "@/constants/Colors";
+import { Layout } from "@/constants/Layout";
+import PreferenceItem from "@/components/profile/PreferenceItem";
+import PetTypeSelector from "@/components/profile/PetTypeSelector";
+import RangeSelector from "@/components/profile/RangeSelector";
+import { mockUser } from "@/data/mockData";
+import { UserPreferencesContext } from "@/context/UserPreferencesContext";
 
 export default function ProfileScreen() {
-  const [preferences, setPreferences] = useState(mockUser.preferences);
-  
-  // Toggle preference value
-  const togglePreference = (key: keyof typeof preferences) => {
-    if (typeof preferences[key] === 'boolean') {
-      setPreferences({
-        ...preferences,
-        [key]: !preferences[key],
-      });
-    }
+  const { preferences, updatePreferences } = useContext(UserPreferencesContext);
+  const [showPetTypes, setShowPetTypes] = useState(false);
+  const [showAgeRange, setShowAgeRange] = useState(false);
+  const [showDistance, setShowDistance] = useState(false);
+
+  const handleUpdatePetTypes = (types: string[]) => {
+    updatePreferences({ ...preferences, petTypes: types });
+    setShowPetTypes(false);
+  };
+
+  const handleUpdateAgeRange = (range: [number, number]) => {
+    updatePreferences({ ...preferences, ageRange: range });
+    setShowAgeRange(false);
+  };
+
+  const handleUpdateDistance = (distance: number) => {
+    updatePreferences({ ...preferences, maxDistance: distance });
+    setShowDistance(false);
+  };
+
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => {
+          // Handle logout
+          Alert.alert("Logged out successfully");
+        },
+      },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header with profile info */}
         <View style={styles.header}>
-          <Image
-            source={{ uri: mockUser.photo }}
-            style={styles.profileImage}
-          />
+          <Image source={{ uri: mockUser.photo }} style={styles.profileImage} />
           <Text style={styles.name}>{mockUser.name}</Text>
         </View>
-        
-        {/* Preferences Section */}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferences</Text>
-          
+
           <View style={styles.card}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowPetTypes(true)}
+            >
               <View style={styles.menuItemContent}>
                 <Text style={styles.menuItemTitle}>Pet Types</Text>
                 <Text style={styles.menuItemValue}>
-                  {preferences.petTypes.join(', ')}
+                  {preferences.petTypes.join(", ")}
                 </Text>
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.menuItem}>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowAgeRange(true)}
+            >
               <View style={styles.menuItemContent}>
                 <Text style={styles.menuItemTitle}>Age Range</Text>
                 <Text style={styles.menuItemValue}>
@@ -63,8 +96,11 @@ export default function ProfileScreen() {
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.menuItem}>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowDistance(true)}
+            >
               <View style={styles.menuItemContent}>
                 <Text style={styles.menuItemTitle}>Max Distance</Text>
                 <Text style={styles.menuItemValue}>
@@ -75,25 +111,25 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        
-        {/* Notifications Section */}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Notifications</Text>
-          
+
           <View style={styles.card}>
             <PreferenceItem
               label="Push Notifications"
               value={preferences.notifications}
-              onValueChange={() => togglePreference('notifications')}
+              onValueChange={(value) =>
+                updatePreferences({ ...preferences, notifications: value })
+              }
               description="Receive notifications for new matches and messages"
             />
           </View>
         </View>
-        
-        {/* Support Section */}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Support</Text>
-          
+
           <View style={styles.card}>
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemIcon}>
@@ -104,7 +140,7 @@ export default function ProfileScreen() {
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemIcon}>
                 <Shield size={24} color={Colors.primary.accent1} />
@@ -114,7 +150,7 @@ export default function ProfileScreen() {
               </View>
               <ChevronRight size={20} color={Colors.text.tertiary} />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuItemIcon}>
                 <Bell size={24} color={Colors.primary.accent1} />
@@ -126,17 +162,47 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        
-        {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton}>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <LogOut size={20} color={Colors.secondary.red} />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.versionContainer}>
           <Text style={styles.versionText}>SwipePaw v1.0.0</Text>
         </View>
       </ScrollView>
+
+      <PetTypeSelector
+        visible={showPetTypes}
+        selectedTypes={preferences.petTypes}
+        onClose={() => setShowPetTypes(false)}
+        onSave={handleUpdatePetTypes}
+      />
+
+      <RangeSelector
+        visible={showAgeRange}
+        title="Age Range"
+        value={preferences.ageRange}
+        min={0}
+        max={20}
+        step={1}
+        unit="years"
+        onClose={() => setShowAgeRange(false)}
+        onSave={handleUpdateAgeRange}
+      />
+
+      <RangeSelector
+        visible={showDistance}
+        title="Maximum Distance"
+        value={[0, preferences.maxDistance]}
+        min={1}
+        max={100}
+        step={1}
+        unit="miles"
+        onClose={() => setShowDistance(false)}
+        onSave={(range) => handleUpdateDistance(range[1])}
+      />
     </SafeAreaView>
   );
 }
@@ -150,7 +216,7 @@ const styles = StyleSheet.create({
     paddingBottom: Layout.spacing.xxl,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: Layout.spacing.xl,
     paddingBottom: Layout.spacing.lg,
   },
@@ -164,7 +230,7 @@ const styles = StyleSheet.create({
     ...shadowStyles.medium,
   },
   name: {
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
     fontSize: 24,
     color: Colors.text.primary,
   },
@@ -173,7 +239,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Layout.spacing.lg,
   },
   sectionTitle: {
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: "Poppins-SemiBold",
     fontSize: 18,
     color: Colors.text.primary,
     marginBottom: Layout.spacing.sm,
@@ -182,11 +248,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: Layout.borderRadius.medium,
     ...shadowStyles.small,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: Layout.spacing.md,
     paddingHorizontal: Layout.spacing.lg,
     borderBottomWidth: 1,
@@ -199,38 +265,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemTitle: {
-    fontFamily: 'Poppins-Medium',
+    fontFamily: "Poppins-Medium",
     fontSize: 16,
     color: Colors.text.primary,
   },
   menuItemValue: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
     fontSize: 14,
     color: Colors.text.secondary,
     marginTop: 2,
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: Layout.spacing.xl,
     paddingVertical: Layout.spacing.md,
     marginHorizontal: Layout.spacing.lg,
-    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+    backgroundColor: "rgba(231, 76, 60, 0.1)",
     borderRadius: Layout.borderRadius.medium,
   },
   logoutText: {
-    fontFamily: 'Poppins-Medium',
+    fontFamily: "Poppins-Medium",
     fontSize: 16,
     color: Colors.secondary.red,
     marginLeft: Layout.spacing.sm,
   },
   versionContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: Layout.spacing.xl,
   },
   versionText: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: "Inter-Regular",
     fontSize: 12,
     color: Colors.text.tertiary,
   },
