@@ -1,146 +1,181 @@
-import "react-native-url-polyfill/auto";
-import { useState, useRef } from "react";
-import {
-  Animated,
-  PanResponder,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Button,
-} from "react-native";
-import { SAMPLE_PETS } from "@/data/pets";
-import MatchModal from "@/components/MatchModal";
-import { Heart, X } from "lucide-react-native";
+import React, { useState, useRef } from "react";
+import { View, StyleSheet, SafeAreaView, Text } from "react-native";
+import { useRouter } from "expo-router";
+import { X, Heart, Info } from "lucide-react-native";
+import { Colors } from "@/constants/Colors";
+import { Layout } from "@/constants/Layout";
+import PetCard from "@/components/cards/PetCard";
+import ActionButton from "@/components/ui/ActionButton";
+import MatchModal from "@/components/cards/MatchModal";
+import { mockPets, mockUser } from "@/data/mockData";
+import { Pet } from "@/types";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-
-export default function SwipeScreen() {
+export default function DiscoverScreen() {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMatch, setShowMatch] = useState(false);
+  const [matchVisible, setMatchVisible] = useState(false);
+  const [matchedPet, setMatchedPet] = useState<Pet | null>(null);
+  const swipedPetsRef = useRef<Set<string>>(new Set());
 
-  const position = useRef(new Animated.ValueXY()).current;
+  // Current pet to display
+  const currentPet = mockPets[currentIndex];
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dx) > 10,
-      onPanResponderMove: Animated.event(
-        [null, { dx: position.x, dy: position.y }],
-        { useNativeDriver: false }
-      ),
-      onPanResponderRelease: (_, gesture) => {
-        if (Math.abs(gesture.dx) > 120) {
-          Animated.timing(position, {
-            toValue: { x: gesture.dx > 0 ? SCREEN_WIDTH : -SCREEN_WIDTH, y: 0 },
-            duration: 250,
-            useNativeDriver: false,
-          }).start(() => {
-            position.setValue({ x: 0, y: 0 });
-            setCurrentIndex((prev) => prev + 1);
-            if (Math.random() < 0.1) setShowMatch(true);
-          });
-        } else {
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            useNativeDriver: false,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  // Handle swipe actions
+  const handleSwipeLeft = () => {
+    // Skip this pet
+    swipedPetsRef.current.add(currentPet.id);
+    // Move to next pet
+    moveToNextPet();
+  };
 
-  if (currentIndex >= SAMPLE_PETS.length) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.noMoreText}>No more pets to show!</Text>
-      </View>
-    );
-  }
+  const handleSwipeRight = () => {
+    // Like this pet
+    swipedPetsRef.current.add(currentPet.id);
 
-  const pet = SAMPLE_PETS[currentIndex];
-  const rotate = position.x.interpolate({
-    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: ["-20deg", "0deg", "20deg"],
-    extrapolate: "clamp",
-  });
+    // Simulate a match (for demo purposes, every other like is a match)
+    if (currentIndex % 2 === 0) {
+      setMatchedPet(currentPet);
+      setMatchVisible(true);
+    }
 
-  const animatedStyle = {
-    transform: [...position.getTranslateTransform(), { rotate }],
+    // Move to next pet
+    moveToNextPet();
+  };
+
+  const handleSwipeUp = () => {
+    // Navigate to pet details
+    router.push(`/pet/${currentPet.id}`);
+  };
+
+  const moveToNextPet = () => {
+    if (currentIndex < mockPets.length - 1) {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+    } else {
+      // Reached the end of the list
+      // In a real app, you'd fetch more pets
+      setCurrentIndex(0); // For demo, loop back to start
+    }
+  };
+
+  // Handle match modal actions
+  const handleCloseMatch = () => {
+    setMatchVisible(false);
+    setMatchedPet(null);
+  };
+
+  const handleStartChat = () => {
+    // In a real app, this would create a conversation
+    setMatchVisible(false);
+    if (matchedPet) {
+      // Navigate to chat
+      router.push(`/chat/${matchedPet.id}`);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[styles.card, animatedStyle]}
-      >
-        <Image source={{ uri: pet.image }} style={styles.image} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{pet.name}</Text>
-          <Text style={styles.age}>{pet.age}</Text>
-          <Text style={styles.description}>{pet.description}</Text>
-        </View>
-      </Animated.View>
-
-      <View style={styles.actionButtons}>
-        <TouchableOpacity onPress={() => setCurrentIndex((prev) => prev + 1)}>
-          <X color="#FF4B4B" size={32} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            setCurrentIndex((prev) => prev + 1);
-            if (Math.random() < 0.1) setShowMatch(true);
-          }}
-        >
-          <Heart color="#FFB5C2" size={32} fill="#FFB5C2" />
-        </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.appName}>SwipePaw</Text>
       </View>
 
-      <MatchModal
-        isVisible={showMatch}
-        pet={pet}
-        onClose={() => setShowMatch(false)}
-      />
-    </View>
+      <View style={styles.cardContainer}>
+        {currentPet ? (
+          <PetCard
+            pet={currentPet}
+            onSwipeLeft={handleSwipeLeft}
+            onSwipeRight={handleSwipeRight}
+            onSwipeUp={handleSwipeUp}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              No more pets to discover. Check back later!
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.actionsContainer}>
+        <ActionButton
+          icon={<X size={32} color="white" />}
+          variant="negative"
+          onPress={handleSwipeLeft}
+          style={styles.actionButton}
+        />
+
+        <ActionButton
+          icon={<Info size={32} color={Colors.primary.accent2} />}
+          variant="info"
+          onPress={handleSwipeUp}
+          style={styles.actionButton}
+        />
+
+        <ActionButton
+          icon={<Heart size={32} color="white" />}
+          variant="primary"
+          onPress={handleSwipeRight}
+          style={styles.actionButton}
+        />
+      </View>
+
+      {/* Match modal */}
+      {matchedPet && (
+        <MatchModal
+          visible={matchVisible}
+          pet={matchedPet}
+          user={mockUser}
+          onClose={handleCloseMatch}
+          onStartChat={handleStartChat}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Colors.primary.background,
   },
-  logoutContainer: {
-    marginTop: 50,
-    width: "100%",
-    paddingHorizontal: 20,
-    alignItems: "flex-end",
-  },
-  card: {
-    width: SCREEN_WIDTH * 0.9,
-    height: SCREEN_WIDTH * 1.3,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    elevation: 5,
-    overflow: "hidden",
-    position: "absolute",
-    top: 100,
-  },
-  image: { width: "100%", height: "70%" },
-  infoContainer: { padding: 20 },
-  name: { fontSize: 24, fontWeight: "bold" },
-  age: { fontSize: 16, color: "#666" },
-  description: { fontSize: 14, color: "#444" },
-  actionButtons: {
+  header: {
+    paddingHorizontal: Layout.spacing.lg,
+    paddingVertical: Layout.spacing.md,
     flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
-    position: "absolute",
-    bottom: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  noMoreText: { fontSize: 18, color: "#666", marginTop: 100 },
+  appName: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 24,
+    color: Colors.primary.accent1,
+  },
+  cardContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 80, // Space for action buttons
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: Layout.spacing.lg,
+  },
+  actionButton: {
+    marginHorizontal: Layout.spacing.xs,
+  },
+  emptyState: {
+    padding: Layout.spacing.xl,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyStateText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 18,
+    color: Colors.text.secondary,
+    textAlign: "center",
+  },
 });

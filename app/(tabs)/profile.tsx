@@ -1,128 +1,237 @@
+import React, { useState } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
-  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Image,
   ScrollView,
-} from "react-native";
-import { Settings, Heart, Bell, Shield, HelpCircle } from "lucide-react-native";
+  TouchableOpacity,
+} from 'react-native';
+import { ChevronRight, Bell, Shield, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
+import { Colors, shadowStyles } from '@/constants/Colors';
+import { Layout } from '@/constants/Layout';
+import PreferenceItem from '@/components/profile/PreferenceItem';
+import { mockUser } from '@/data/mockData';
 
 export default function ProfileScreen() {
+  const [preferences, setPreferences] = useState(mockUser.preferences);
+  
+  // Toggle preference value
+  const togglePreference = (key: keyof typeof preferences) => {
+    if (typeof preferences[key] === 'boolean') {
+      setPreferences({
+        ...preferences,
+        [key]: !preferences[key],
+      });
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.profileImage}>
-          <Text style={styles.profileInitial}>J</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header with profile info */}
+        <View style={styles.header}>
+          <Image
+            source={{ uri: mockUser.photo }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.name}>{mockUser.name}</Text>
         </View>
-        <Text style={styles.name}>John Doe</Text>
-        <Text style={styles.email}>john.doe@example.com</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <TouchableOpacity style={styles.menuItem}>
-          <Settings size={20} color="#666" />
-          <Text style={styles.menuText}>Account Settings</Text>
+        
+        {/* Preferences Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferences</Text>
+          
+          <View style={styles.card}>
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Pet Types</Text>
+                <Text style={styles.menuItemValue}>
+                  {preferences.petTypes.join(', ')}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Age Range</Text>
+                <Text style={styles.menuItemValue}>
+                  {preferences.ageRange[0]} - {preferences.ageRange[1]} years
+                </Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Max Distance</Text>
+                <Text style={styles.menuItemValue}>
+                  {preferences.maxDistance} miles
+                </Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        {/* Notifications Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Notifications</Text>
+          
+          <View style={styles.card}>
+            <PreferenceItem
+              label="Push Notifications"
+              value={preferences.notifications}
+              onValueChange={() => togglePreference('notifications')}
+              description="Receive notifications for new matches and messages"
+            />
+          </View>
+        </View>
+        
+        {/* Support Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Support</Text>
+          
+          <View style={styles.card}>
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemIcon}>
+                <HelpCircle size={24} color={Colors.primary.accent1} />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Help & Support</Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemIcon}>
+                <Shield size={24} color={Colors.primary.accent1} />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Privacy Policy</Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuItemIcon}>
+                <Bell size={24} color={Colors.primary.accent1} />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemTitle}>Terms of Service</Text>
+              </View>
+              <ChevronRight size={20} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutButton}>
+          <LogOut size={20} color={Colors.secondary.red} />
+          <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Heart size={20} color="#666" />
-          <Text style={styles.menuText}>Liked Pets</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Bell size={20} color="#666" />
-          <Text style={styles.menuText}>Notifications</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Shield size={20} color="#666" />
-          <Text style={styles.menuText}>Privacy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <HelpCircle size={20} color="#666" />
-          <Text style={styles.menuText}>Help & Support</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.version}>Version 1.0.0</Text>
-    </ScrollView>
+        
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>SwipePaw v1.0.0</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Colors.primary.background,
+  },
+  scrollContent: {
+    paddingBottom: Layout.spacing.xxl,
   },
   header: {
-    backgroundColor: "white",
-    padding: 20,
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEE",
+    alignItems: 'center',
+    paddingTop: Layout.spacing.xl,
+    paddingBottom: Layout.spacing.lg,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#FFB5C2",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  profileInitial: {
-    fontSize: 32,
-    color: "white",
-    fontWeight: "600",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: Colors.primary.accent1,
+    marginBottom: Layout.spacing.md,
+    ...shadowStyles.medium,
   },
   name: {
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: "#666",
+    color: Colors.text.primary,
   },
   section: {
-    backgroundColor: "white",
-    marginTop: 20,
-    padding: 20,
+    marginTop: Layout.spacing.lg,
+    paddingHorizontal: Layout.spacing.lg,
   },
   sectionTitle: {
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 15,
+    color: Colors.text.primary,
+    marginBottom: Layout.spacing.sm,
+  },
+  card: {
+    backgroundColor: Colors.ui.cardBackground,
+    borderRadius: Layout.borderRadius.medium,
+    ...shadowStyles.small,
+    overflow: 'hidden',
   },
   menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Layout.spacing.md,
+    paddingHorizontal: Layout.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: Colors.ui.border,
   },
-  menuText: {
-    marginLeft: 15,
+  menuItemIcon: {
+    marginRight: Layout.spacing.md,
+  },
+  menuItemContent: {
+    flex: 1,
+  },
+  menuItemTitle: {
+    fontFamily: 'Poppins-Medium',
     fontSize: 16,
-    color: "#333",
+    color: Colors.text.primary,
+  },
+  menuItemValue: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: Colors.text.secondary,
+    marginTop: 2,
   },
   logoutButton: {
-    margin: 20,
-    backgroundColor: "#FFB5C2",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Layout.spacing.xl,
+    paddingVertical: Layout.spacing.md,
+    marginHorizontal: Layout.spacing.lg,
+    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+    borderRadius: Layout.borderRadius.medium,
   },
   logoutText: {
-    color: "white",
+    fontFamily: 'Poppins-Medium',
     fontSize: 16,
-    fontWeight: "600",
+    color: Colors.secondary.red,
+    marginLeft: Layout.spacing.sm,
   },
-  version: {
-    textAlign: "center",
-    color: "#999",
-    marginBottom: 20,
+  versionContainer: {
+    alignItems: 'center',
+    marginTop: Layout.spacing.xl,
+  },
+  versionText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 12,
+    color: Colors.text.tertiary,
   },
 });
