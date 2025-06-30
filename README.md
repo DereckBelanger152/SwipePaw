@@ -1,67 +1,131 @@
-<div style="background:#f9f9fb; padding:20px; border-radius:12px; font-family:sans-serif; color:#333; line-height:1.6;">
+# SwipePaw
 
-<h1 style="color:#a97fc4; text-align:center; margin-bottom:10px;">SwipePaw</h1>
+<div align="center">
 
-<p style="text-align:center; font-size:18px; color:#7d5ba6;"><strong>Connect. Swipe. Adopt.</strong></p>
+![SwipePaw](https://img.shields.io/badge/SwipePaw-Pet_Adoption_App-ff9ec7?style=for-the-badge&labelColor=ffd1dc)
 
-<p>SwipePaw is a mobile app that lets pet owners and animal shelters connect for playdates or adoptions – inspired by swipe-based dating apps, but with a mission to create real impact. </p>
+**Connect. Swipe. Adopt.**
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+*Tinder for pet adoption - connecting animals with their perfect families*
 
-<h2 style="color:#a97fc4;">What is SwipePaw?</h2>
+[![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat-square&logo=react&logoColor=61DAFB&color=e6f3ff)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white&color=cce7ff)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=flat-square&logo=Firebase&logoColor=white&color=fff2cc)](https://firebase.google.com/)
+[![Expo](https://img.shields.io/badge/Expo-4630EB?style=flat-square&logo=expo&logoColor=white&color=e8f4fd)](https://expo.dev/)
 
-<ul>
-  <li>Browse <strong>profiles of local animals</strong> looking adoption</li>
-  <li>Swipe right to <strong>match</strong> and start a conversation with the shelter</li>
-  <li><strong>Chat directly</strong> with owners or shelters to arrange meetings or adoptions</li>
-  <li>Discover adoptable pets from your local <strong>SPCA</strong> in an intuitive, friendly interface</li>
-</ul>
+</div>
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+---
 
-<h2 style="color:#a97fc4;">Why am I building it?</h2>
+## What is SwipePaw?
 
-<p>SwipePaw is more than just an app idea. It’s my way to:</p>
+SwipePaw is a mobile app that brings the familiar swipe-based interface to pet adoption. Browse profiles of local animals, swipe to match, and chat directly with shelters to arrange meetings or adoptions.
 
-<ul>
-  <li><strong>Explore new technologies</strong> like React Native, Expo, Firestore, and TypeScript</li>
-  <li>Build <strong>real-world features</strong> found in professional apps</li>
-  <li>Challenge myself technically and creatively, from <strong>authentication flows to chat systems</strong></li>
-  <li><strong>Advance my career</strong> by demonstrating I can design, build, and deliver impactful products</li>
-  <li>Grow towards my goal of <strong>joining top engineering teams</strong>, while creating technology that matters</li>
-</ul>
+**Key Features:**
+- Browse profiles of local animals looking for adoption
+- Swipe right to match and start conversations with shelters
+- Chat directly with owners or shelters to arrange meetings
+- Discover adoptable pets from local SPCAs in an intuitive interface
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+---
 
-<h2 style="color:#a97fc4;">Current Features</h2>
+## Why I'm Building This
 
-<ul>
-  <li>✔️ Swipeable cards for animal profiles</li>
-  <li>➔ Real-time chat prototype using Firestore (in progress)</li>
-  <li>➔ Secure account creation and authentication (in progress)</li>
-  <li>➔ Persistent sessions and user management (in progress)</li>
-  <li>➔ Adoption flow with SPCA API integration (research phase)</li>
-</ul>
+This project serves multiple purposes beyond just creating another app:
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+- **Technical Growth** - Exploring React Native, Expo, Firestore, and TypeScript
+- **Real-World Experience** - Building production-level features like authentication and chat systems
+- **Portfolio Development** - Demonstrating ability to design, build, and deliver complete products
+- **Career Advancement** - Working toward joining top engineering teams
+- **Social Impact** - Creating technology that helps animals find homes
 
-<h2 style="color:#a97fc4;">Technology Stack</h2>
+---
 
-<ul>
-  <li><strong>React Native (Expo)</strong> for cross-platform mobile development</li>
-  <li><strong>TypeScript</strong> for clean, maintainable code</li>
-  <li><strong>Firebase Firestore</strong> for real-time chat and data storage</li>
-  <li><strong>Node.js (planned)</strong> for backend integrations and services</li>
-</ul>
+## Development Roadmap
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+### Core App Architecture
+- Design app navigation flow using React Navigation
+- Implement responsive UI components for cards, buttons, and inputs
+- Build the animal swipe cards interface with smooth animations
 
-<h2 style="color:#a97fc4;">How to Contribute</h2>
+### Real-Time Chat System
+- Design Firestore data structure for messages and chats
+- Implement chat UI with message bubbles
+- Enable real-time message listening and notifications
 
-<p>SwipePaw is currently a personal learning and portfolio project, but feedback, ideas, and suggestions are always welcome. Open an issue or reach out if you want to share your thoughts or collaborate in the future.</p>
+### Authentication & User Management
+- Integrate Firebase Authentication (email/password and social logins)
+- Create Sign Up, Login, and Logout screens
+- Implement persistent user sessions with auto-login
+- Store user profile data in Firestore
 
-<hr style="border:none; border-top:1px solid #e0dff1;">
+### Animal Profiles Management
+- Create comprehensive animal data model (photos, details, location, status)
+- Implement detailed animal profile views
+- Design fallback UI for empty states
+- Add animal management features for shelters
 
-<p style="font-size:12px; text-align:center; color:#999;">MIT License</p>
+### SPCA/Shelter Integration
+- Research available APIs and data sharing policies
+- Integrate external data fetching to populate animal profiles
+- Implement verification badges for official shelter listings
+- Handle real-time availability updates
+
+### UI/UX Polish
+- Apply consistent pastel theme with proper typography and spacing
+- Polish animations and transitions throughout the app
+- Optimize for iOS devices and screen sizes
+
+### Deployment & Release
+- Configure app icons, splash screens, and branding
+- Set up App Store listings with proper metadata
+- Test across multiple iOS devices
+- Plan launch strategy and marketing materials
+
+### Future Enhancements
+- Location-based filtering and search
+- Push notifications for matches and messages
+- Admin dashboard for shelter management
+- Gamification features to encourage adoption
+
+---
+
+## Technology Stack
+
+| Category | Technology | Purpose |
+|----------|------------|---------|
+| **Frontend** | React Native (Expo) | Cross-platform mobile development |
+| **Language** | TypeScript | Type-safe, maintainable code |
+| **Database** | Firebase Firestore | Real-time data and chat functionality |
+| **Backend** | Node.js (planned) | API integrations and services |
+| **Authentication** | Firebase Auth | User management and security |
+
+---
+
+## Contributing
+
+SwipePaw is currently a personal learning project and portfolio piece. While it's not open for direct contributions yet, feedback and suggestions are welcome.
+
+**Ways to help:**
+- Report bugs or suggest improvements
+- Share ideas for new features
+- Provide feedback on design and user experience
+- Test the app and share your thoughts
+
+Feel free to open an issue or reach out directly if you'd like to discuss the project.
+
+---
+
+## License
+
+MIT License
+
+---
+
+<div align="center">
+
+**Built for pets and their future families**
+
+*Making pet adoption more accessible, one swipe at a time*
 
 </div>
