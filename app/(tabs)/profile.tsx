@@ -1,166 +1,109 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Settings, Heart, MessageCircle, Camera } from 'lucide-react-native';
-import ActionButton from '@/components/ActionButton';
-import ProfileCard from '@/components/ProfileCard';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 
 export default function ProfileScreen() {
   return (
-    <LinearGradient
-      colors={['#F0F9FF', '#FEF3C7', '#F0FDF4']}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.header}>
-            <View style={styles.profileImageContainer}>
-              <Image
-                source={{ uri: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400' }}
-                style={styles.profileImage}
-              />
-              <View style={styles.cameraButton}>
-                <Camera color="#FFFFFF" size={16} />
-              </View>
-            </View>
-            
-            <Text style={styles.userName}>Alex Johnson</Text>
-            <Text style={styles.userBio}>Pet lover • Dog parent • Cat enthusiast</Text>
-          </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.profileImage}>
+          <Text style={styles.profileInitial}>G</Text>
+        </View>
+        <Text style={styles.name}>Guest User</Text>
+      </View>
 
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Heart color="#FF6B8A" size={24} />
-              <Text style={styles.statNumber}>127</Text>
-              <Text style={styles.statLabel}>Pets Liked</Text>
-            </View>
-            <View style={styles.statItem}>
-              <MessageCircle color="#6BB6FF" size={24} />
-              <Text style={styles.statNumber}>23</Text>
-              <Text style={styles.statLabel}>Matches</Text>
-            </View>
-          </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Settings</Text>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="settings" size={20} color="#666" />
+          <Text style={styles.menuText}>Account Settings</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="heart" size={20} color="#666" />
+          <Text style={styles.menuText}>Favorites</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="notifications" size={20} color="#666" />
+          <Text style={styles.menuText}>Notifications</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="shield" size={20} color="#666" />
+          <Text style={styles.menuText}>Privacy</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <Ionicons name="help-circle" size={20} color="#666" />
+          <Text style={styles.menuText}>Help & Support</Text>
+        </TouchableOpacity>
+      </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
-            <ProfileCard
-              title="Favorite Pet Types"
-              subtitle="Dogs, Cats, Rabbits"
-              icon={<Heart color="#FF6B8A" size={20} />}
-            />
-            <ProfileCard
-              title="Account Settings"
-              subtitle="Privacy, notifications, and more"
-              icon={<Settings color="#6B7280" size={20} />}
-            />
-          </View>
-
-          <ActionButton
-            title="Edit Profile"
-            onPress={() => {}}
-            style={styles.editButton}
-          />
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      <Text style={styles.version}>Version 1.0.0</Text>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
+    backgroundColor: "#F8F8F8",
   },
   header: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 24,
-  },
-  profileImageContainer: {
-    position: 'relative',
-    marginBottom: 16,
+    backgroundColor: "white",
+    padding: 20,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: '#FFFFFF',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#007AFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
   },
-  cameraButton: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: '#6BB6FF',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+  profileInitial: {
+    fontSize: 32,
+    color: "white",
+    fontWeight: "600",
   },
-  userName: {
+  name: {
     fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    color: '#1F2937',
+    fontWeight: "600",
     marginBottom: 4,
   },
-  userBio: {
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    marginBottom: 32,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 20,
-    marginHorizontal: 8,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    color: '#1F2937',
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-    marginTop: 4,
-  },
   section: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
+    backgroundColor: "white",
+    marginTop: 20,
+    padding: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-Bold',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
   },
-  editButton: {
-    backgroundColor: '#4ECDC4',
-    marginHorizontal: 24,
-    marginBottom: 32,
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  menuText: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "#333",
+  },
+  version: {
+    textAlign: "center",
+    color: "#999",
+    marginTop: 20,
+    marginBottom: 20,
   },
 });
