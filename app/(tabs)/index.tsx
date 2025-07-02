@@ -28,6 +28,10 @@ import { SAMPLE_PETS } from "@/data/pets";
 import { Match, Pet } from "@/types/pet";
 import MatchModal from "@/components/MatchModal";
 import React from "react";
+// Firebase authentication
+import { signOut } from "firebase/auth";
+import { auth } from "@/services/firebaseAuth";
+import { router } from "expo-router";
 
 // Get screen dimensions for responsive design
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -126,6 +130,15 @@ export default function SwipeScreen() {
   if (currentIndex >= SAMPLE_PETS.length) {
     return (
       <View style={styles.container}>
+        <TouchableOpacity
+          style={{ position: "absolute", top: 40, right: 20, zIndex: 10 }}
+          onPress={async () => {
+            await signOut(auth);
+            router.replace("/(auth)/login");
+          }}
+        >
+          <Text style={{ color: "#FF4757", fontWeight: "bold" }}>Sign Out</Text>
+        </TouchableOpacity>
         <Text style={styles.noMoreText}>No more pets to show!</Text>
       </View>
     );
@@ -136,6 +149,16 @@ export default function SwipeScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Sign Out button */}
+      <TouchableOpacity
+        style={{ position: "absolute", top: 40, right: 20, zIndex: 10 }}
+        onPress={async () => {
+          await signOut(auth);
+          router.replace("/(auth)/login");
+        }}
+      >
+        <Text style={{ color: "#FF4757", fontWeight: "bold" }}>Sign Out</Text>
+      </TouchableOpacity>
       {/* Gesture detector wraps the card to enable swipe gestures */}
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.card, animatedStyle]}>
